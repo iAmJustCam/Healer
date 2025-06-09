@@ -1,0 +1,18 @@
+{
+  "identical": {
+    "groups": [
+      {
+        "canonicalFile": "src/types/canonical/core/primitives.ts",
+        "duplicates": [
+          "src/types/canonical/core/primitives.ts"
+        ]
+      },
+      {
+        "canonicalFile": "src/types/canonical/domain/risk.ts",
+        "duplicates": [
+          "src/types/canonical/domain/risk.ts"
+        ]
+      }
+    ]
+  }
+}

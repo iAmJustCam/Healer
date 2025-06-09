@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "goal": "Recursive canonical‑type analysis & consolidation",
+    "ignore_paths": [
+      "**/dist/**",
+      "**/node_modules/**",
+      "**/tests/fixtures/**",
+      "**/*.d.ts",
+      "**/type-consolidation.ts"
+    ],
+    "include_paths": [
+      "tests/test-types-*.ts"
+    ],
+    "jaccard_threshold": 0.75
+  },
+  "pipeline": [
+    {
+      "id": "T01_COLLECT_FILES",
+      "desc": "Enumerate all *.ts|*.tsx files obeying ignore_paths",
+      "out": { "files": ["<absolute_path>", "..."] }
+    },
+    {
+      "id": "T02_PARSE_TYPES",
+      "desc": "Extract every interface | type‑alias into {name, file, props}",
+      "out": { "type_shapes": ["<TypeShape>", "..."] }
+    },
+    {
+      "id": "T03_DETECT_IDENTICAL",
+      "desc": "Group type_shapes with identical prop signatures",
+      "out": { "identical": ["<DuplicateReport>", "..."] }
+    },
+    {
+      "id": "T04_DETECT_NEAR_DUPLICATE",
+      "desc": "Compute Jaccard(fileA.props, fileB.props) ≥ jaccard_threshold; report diffs",
+      "out": { "near_duplicate": ["<DuplicateReport>", "..."] }
+    },
+    {
+      "id": "T05_CREATE_CANONICAL",
+      "desc": "For each identical group choose first as canonical; generate canonical interface file path 'src/types/canonical/{Name}.ts'",
+      "out": { "new_files": ["src/types/canonical/<Name>.ts", "..."] }
+    },
+    {
+      "id": "T06_REWRITE_IMPORTS",
+      "desc": "Rewrite all project imports from duplicates → canonical path",
+      "out": { "patched_files": ["<file>:<line_ranges>", "..."] }
+    },
+    {
+      "id": "T07_PRUNE_REDUNDANT",
+      "desc": "List obsolete type files safe to delete after import rewrite",
+      "out": { "remove_files": ["<duplicate_path>", "..."] }
+    }
+  ],
+  "final_report": {
+    "identical": "→ populated by T03",
+    "near_duplicate": "→ populated by T04",
+    "actions": {
+      "create": "→ populated by T05",
+      "replace": "→ populated by T06",
+      "delete": "→ populated by T07"
+    }
+  },
+  "options": {
+    "prioritize_canonical": true,
+    "include_near_duplicates_in_consolidation": true,
+    "auto_create_directories": true,
+    "backup_files_before_changes": true,
+    "dry_run": true,
+    "log_level": "debug",
+    "verbose": true
+  }
+}

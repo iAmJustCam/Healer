@@ -1,0 +1,3 @@
+# Directories to exclude from validation
+transformation-engine-REFACTORED/
+convert-migration-engine/

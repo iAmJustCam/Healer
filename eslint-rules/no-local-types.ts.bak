@@ -1,0 +1,438 @@
+// ESLint rule - TypeScript version
+// Constitutional compliance: Strict Canonical Type Enforcement
+
+/**
+ * ESLint Rule: no-local-types
+ *
+ * Enforces the Project Constitution for Strict Canonical Type Enforcement.
+ * Ensures Single Source of Truth (SSOT) via canonical-types.ts.
+ *
+ * Allowed locations:
+ * - canonical-types.ts (main SSOT)
+ * - *.pipeline.d.ts files (domain extensions via declaration merging)
+ * - test files (*.test.ts, *.spec.ts)
+ *
+ * Violations:
+ * - interface declarations in regular files
+ * - type alias declarations in regular files
+ * - enum declarations in regular files
+ * - duplicate types from canonical-types.ts
+ * - imports that bypass the @types alias
+ * - declaration merging outside pipeline files
+ */
+
+module.exports = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Enforce Strict Canonical Type Enforcement',
+      category: 'Constitutional Compliance',
+      recommended: true,
+    },
+    fixable: 'code',
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allowedFiles: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'File patterns where type definitions are allowed',
+          },
+          exemptTypes: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Type names that are exempt from this rule',
+          },
+          suggestCanonical: {
+            type: 'boolean',
+            description: 'Whether to suggest using canonical types',
+            default: true,
+          },
+          strictImports: {
+            type: 'boolean',
+            description: 'Whether to enforce strict import patterns (@types alias only)',
+            default: true,
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      noLocalInterface:
+        'Interface "{{name}}" should be defined in canonical-types.ts or a pipeline declaration file',
+      noLocalType:
+        'Type alias "{{name}}" should be defined in canonical-types.ts or a pipeline declaration file',
+      noLocalEnum:
+        'Enum "{{name}}" should be defined in canonical-types.ts or a pipeline declaration file',
+      duplicateCanonical: 'Type "{{name}}" is already defined in canonical-types.ts',
+      useCanonicalImport: 'Import from @types instead of "{{name}}" (Constitutional requirement M-01)',
+      useExtensionPattern:
+        'For domain-specific types, use pipeline extension pattern in *.pipeline.d.ts files',
+      nonCanonicalImport: 'Import types only from @types alias, not from "{{name}}" (Constitutional requirement M-01)',
+      invalidMerge: 'Declaration merging only allowed in *.pipeline.d.ts files (Constitutional requirement D-01)',
+      requireInternalComment: 'Extensions must be marked with /** @internal L2 Pipeline Extension */ (Constitutional requirement D-01)',
+    },
+  },
+
+  create(context) {
+    const options = context.options[0] || {};
+    const filename = context.getFilename();
+
+    // Default allowed file patterns
+    const defaultAllowedFiles = [
+      '../types/canonical-types.ts',
+      '**/*.pipeline.d.ts',
+      '**/*.test.ts',
+      '**/*.spec.ts',
+      '**/*.d.ts',
+    ];
+
+    const allowedFiles = options.allowedFiles || defaultAllowedFiles;
+    const exemptTypes = new Set(options.exemptTypes || []);
+    const suggestCanonical = options.suggestCanonical !== false;
+    const strictImports = options.strictImports !== false;
+
+    // Expanded canonical types list from canonical-types.ts
+    const canonicalTypes = new Set([
+      // Core Types
+      'ApiResponse',
+      'ApiError',
+      'ResponseMetadata',
+      'ValidationError',
+      // Enums
+      'RiskLevel',
+      'ConfidenceScore',
+      'ComplexityLevel',
+      'OutputFormat',
+      'ValidationLevel',
+      'TransformationStrategy',
+      'Framework',
+      'TransformationStatus',
+      'ErrorCategory',
+      'Severity',
+      'BusinessDomain',
+      // Branded Types
+      'EntityId',
+      'OperationId',
+      'PatternId',
+      'TransformationId',
+      'CommitSHA',
+      'BranchName',
+      'CanonicalId',
+      'Timestamp',
+      'FilePath',
+      'DirectoryPath',
+      'FileInfo',
+      // Domain Types
+      'PatternMatch',
+      'TransformationResult',
+      'ChangeRecord',
+      'RiskAssessment',
+      'RiskFactor',
+      'MigrationConfiguration',
+      'MigrationSession',
+      'Engine',
+      'PipelineContext',
+      'PipelineParamMap',
+      'PipelineParams',
+      'Result',
+      // Utility Types
+      'Nullable',
+      'Optional',
+      'Awaitable',
+      'DeepReadonly',
+      'NonEmptyArray',
+      'KeysOfType',
+    ]);
+
+    function isFileAllowed(filename) {
+      return allowedFiles.some((pattern) => {
+        // Simple glob-like matching
+        const regex = new RegExp(
+          '^' + pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*') + '$',
+        );
+        return regex.test(filename);
+      });
+    }
+
+    function isPipelineFile(filename) {
+      return filename.endsWith('.pipeline.d.ts');
+    }
+
+    function isTypeExempt(typeName) {
+      return exemptTypes.has(typeName);
+    }
+
+    function hasInternalExtensionComment(node) {
+      const comments = context.getSourceCode().getCommentsBefore(node);
+      return comments.some(comment => 
+        comment.type === 'Block' && 
+        comment.value.includes('@internal') && 
+        comment.value.includes('L2 Pipeline Extension')
+      );
+    }
+
+    function createTypeViolation(node, messageId, typeName, suggestions = []) {
+      const report = {
+        node,
+        messageId,
+        data: { name: typeName },
+      };
+
+      if (suggestions.length > 0) {
+        report.suggest = suggestions.map((suggestion) => ({
+          desc: suggestion.desc,
+          fix: suggestion.fix,
+        }));
+      }
+
+      context.report(report);
+    }
+
+    function createCanonicalSuggestion(node, typeName) {
+      if (!suggestCanonical) return [];
+
+      return [
+        {
+          desc: `Import ${typeName} from @types instead`,
+          fix: function (fixer) {
+            const sourceCode = context.getSourceCode();
+            const program = sourceCode.ast;
+
+            // Find existing imports
+            const existingImport = program.body.find(
+              (stmt) => stmt.type === 'ImportDeclaration' && stmt.source.value === '@types',
+            );
+
+            if (existingImport) {
+              // Add to existing import
+              const lastSpecifier = existingImport.specifiers[existingImport.specifiers.length - 1];
+              return fixer.insertTextAfter(lastSpecifier, `, ${typeName}`);
+            } else {
+              // Create new import at top of file
+              return fixer.insertTextBefore(
+                program.body[0],
+                `import { ${typeName} } from '@types';\n`,
+              );
+            }
+          },
+        },
+      ];
+    }
+
+    function createExtensionSuggestion(node, typeName) {
+      return [
+        {
+          desc: 'Use pipeline extension pattern for domain-specific types',
+          fix: function (fixer) {
+            // Create a suggestion for proper pipeline extension
+            return fixer.insertTextBefore(
+              node,
+              `// Constitutional Compliance: Move to a *.pipeline.d.ts file using this pattern:\n` +
+              `// declare module '@types' {\n` +
+              `//   /** @internal L2 Pipeline Extension */\n` +
+              `//   interface PipelineParamMap {\n` +
+              `//     'your-domain': {\n` +
+              `//       readonly ${typeName}Param: YourType;\n` +
+              `//     }\n` +
+              `//   }\n` +
+              `// }\n`,
+            );
+          },
+        },
+      ];
+    }
+
+    function createInternalCommentSuggestion(node) {
+      return [
+        {
+          desc: 'Add required @internal comment for pipeline extension',
+          fix: function (fixer) {
+            return fixer.insertTextBefore(
+              node,
+              `/** @internal L2 Pipeline Extension */\n`,
+            );
+          },
+        },
+      ];
+    }
+
+    return {
+      // Check interface declarations
+      TSInterfaceDeclaration(node) {
+        if (isFileAllowed(filename)) {
+          // For pipeline files, check for proper declaration merging
+          if (isPipelineFile(filename) && node.id.name === 'PipelineParamMap') {
+            if (!hasInternalExtensionComment(node)) {
+              createTypeViolation(node, 'requireInternalComment', node.id.name, 
+                createInternalCommentSuggestion(node));
+            }
+          }
+          return;
+        }
+
+        const typeName = node.id.name;
+        if (isTypeExempt(typeName)) return;
+
+        let suggestions = [];
+        let messageId = 'noLocalInterface';
+
+        if (canonicalTypes.has(typeName)) {
+          messageId = 'duplicateCanonical';
+          suggestions = createCanonicalSuggestion(node, typeName);
+        } else {
+          suggestions = createExtensionSuggestion(node, typeName);
+        }
+
+        createTypeViolation(node, messageId, typeName, suggestions);
+      },
+
+      // Check type alias declarations
+      TSTypeAliasDeclaration(node) {
+        if (isFileAllowed(filename)) return;
+
+        const typeName = node.id.name;
+        if (isTypeExempt(typeName)) return;
+
+        let suggestions = [];
+        let messageId = 'noLocalType';
+
+        if (canonicalTypes.has(typeName)) {
+          messageId = 'duplicateCanonical';
+          suggestions = createCanonicalSuggestion(node, typeName);
+        } else {
+          suggestions = createExtensionSuggestion(node, typeName);
+        }
+
+        createTypeViolation(node, messageId, typeName, suggestions);
+      },
+
+      // Check enum declarations
+      TSEnumDeclaration(node) {
+        if (isFileAllowed(filename)) return;
+
+        const typeName = node.id.name;
+        if (isTypeExempt(typeName)) return;
+
+        let suggestions = [];
+        let messageId = 'noLocalEnum';
+
+        if (canonicalTypes.has(typeName)) {
+          messageId = 'duplicateCanonical';
+          suggestions = createCanonicalSuggestion(node, typeName);
+        } else {
+          suggestions = createExtensionSuggestion(node, typeName);
+        }
+
+        createTypeViolation(node, messageId, typeName, suggestions);
+      },
+
+      // Check for imports that should use @types
+      ImportDeclaration(node) {
+        if (isFileAllowed(filename)) return;
+        if (!strictImports) return;
+
+        const source = node.source.value;
+        
+        // Check for imports that should use @types alias
+        const problematicImports = [
+          './domain.types',
+          './migration.types',
+          './models',
+          './primitives',
+          './enums',
+          './result',
+          '../types/foundation.types',
+          '../types/canonical-types',
+          './foundation.types',
+          './canonical-types',
+        ];
+
+        if (problematicImports.includes(source)) {
+          // Check if the import contains type specifiers
+          const hasTypeImports = node.specifiers.some(specifier => {
+            const importName = specifier.imported ? specifier.imported.name : specifier.local.name;
+            return canonicalTypes.has(importName);
+          });
+
+          if (hasTypeImports) {
+            context.report({
+              node,
+              messageId: 'useCanonicalImport',
+              data: { name: source },
+              fix: function (fixer) {
+                return fixer.replaceText(node.source, '"@types"');
+              },
+            });
+          }
+        }
+        
+        // Check direct imports from types directory
+        else if (source.includes('/types/') && !source.includes('pipeline')) {
+          context.report({
+            node,
+            messageId: 'nonCanonicalImport',
+            data: { name: source },
+            fix: function (fixer) {
+              // Check if all imports are canonical types
+              const allCanonical = node.specifiers.every(specifier => {
+                const importName = specifier.imported ? specifier.imported.name : specifier.local.name;
+                return canonicalTypes.has(importName);
+              });
+              
+              if (allCanonical) {
+                return fixer.replaceText(node.source, '"@types"');
+              }
+              
+              // Cannot automatically fix if some types aren't canonical
+              return null;
+            },
+          });
+        }
+      },
+      
+      // Check declaration merging
+      TSModuleDeclaration(node) {
+        // Allow only in pipeline files
+        if (!isPipelineFile(filename) && node.id.type === 'Literal' && node.id.value === '@types') {
+          context.report({
+            node,
+            messageId: 'invalidMerge',
+          });
+        }
+        
+        // In pipeline files, ensure proper internal comment
+        if (isPipelineFile(filename) && node.id.type === 'Literal' && node.id.value === '@types') {
+          if (!hasInternalExtensionComment(node)) {
+            createTypeViolation(node, 'requireInternalComment', '@types', 
+              createInternalCommentSuggestion(node));
+          }
+        }
+      }
+    };
+  },
+};
+
+// Enhanced ESLint configuration for Constitutional Compliance
+module.exports.eslintConfig = {
+  rules: {
+    'custom/no-local-types': [
+      'error',
+      {
+        allowedFiles: [
+          './types/canonical-types.ts',
+          '**/*.pipeline.d.ts',
+          '**/*.test.ts',
+          '**/*.spec.ts',
+        ],
+        exemptTypes: [
+          'Props', // React component props
+          'State', // React component state
+        ],
+        suggestCanonical: true,
+        strictImports: true,
+      },
+    ],
+  },
+};

@@ -1,0 +1,135 @@
+{
+  "timestamp": "2025-06-06T01:08:46.838Z",
+  "summary": {
+    "filesProcessed": 4,
+    "typesExtracted": 17,
+    "errorsCount": 0
+  },
+  "extractedTypes": [
+    {
+      "name": "ValidationResult",
+      "definition": "export interface ValidationResult {\n  isValid: boolean;\n  errors: string[];\n  warnings: string[];\n  missingPatterns: string[];\n  outdatedVersions: string[];\n  configHealth: 'excellent' | 'good' | 'needs-attention' | 'critical';\n  recommendations: string[];\n}",
+      "sourceFile": "utils/general.ts",
+      "category": "utilities"
+    },
+    {
+      "name": "PatternMatch",
+      "definition": "export interface PatternMatch {\n  framework: string;\n  pattern: string;\n  type: 'ast' | 'string' | 'complex';\n  matches: Array<{\n    line: number;\n    column: number;\n    text: string;\n    severity: 'high' | 'medium' | 'low';\n    suggestedFix?: string;\n  }",
+      "sourceFile": "utils/general.ts",
+      "category": "utilities"
+    },
+    {
+      "name": "RiskAssessment",
+      "definition": "export interface RiskAssessment {\n  overallRisk: 'low' | 'medium' | 'high' | 'critical';\n  riskScore: number; // 0-100\n  frameworkRisks: Array<{\n    framework: string;\n    risk: 'low' | 'medium' | 'high' | 'critical';\n    score: number;\n    issues: string[];\n  }",
+      "sourceFile": "utils/general.ts",
+      "category": "utilities"
+    },
+    {
+      "name": "BusinessContextAnalysis",
+      "definition": "export interface BusinessContextAnalysis {\n  domain: BusinessDomain;\n  businessImpact: string;\n  userFlowsAffected: string[];\n  criticality: number; // 0-10 scale\n  dataHandlingRisk: boolean;\n  accessControlRisk: boolean;\n  customization: {\n    isCustomized: boolean;\n    customizationRisk: number; // 0-10 scale\n  }",
+      "sourceFile": "utils/business-context.ts",
+      "category": "utilities"
+    },
+    {
+      "name": "BusinessDomain",
+      "definition": "export enum BusinessDomain {\n  USER_INTERFACE = 'USER_INTERFACE',\n  USER_AUTHENTICATION = 'USER_AUTHENTICATION',\n  API_INTEGRATION = 'API_INTEGRATION',\n  DATA_VISUALIZATION = 'DATA_VISUALIZATION',\n  SYSTEM_HEALTH = 'SYSTEM_HEALTH',\n  CONFIGURATION = 'CONFIGURATION',\n  UNKNOWN = 'UNKNOWN'\n}",
+      "sourceFile": "utils/business-context.ts",
+      "category": "utilities"
+    },
+    {
+      "name": "MigrationConfig",
+      "definition": "export interface MigrationConfig {\n  patterns: {\n    react19: React19MigrationConfig;\n    nextjs153: NextJS153MigrationConfig;\n    typescript58: TypeScript58MigrationConfig;\n    tailwind41: Tailwind41MigrationConfig;\n    console: ConsoleMigrationConfig;\n    typescriptDebt: TypeScriptDebtConfig;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "React19MigrationConfig",
+      "definition": "export interface React19MigrationConfig {\n  version: {\n    from: string;\n    to: string;\n    releaseDate: string;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "NextJS153MigrationConfig",
+      "definition": "export interface NextJS153MigrationConfig {\n  version: {\n    from: string;\n    to: string;\n    releaseDate: string;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "TypeScript58MigrationConfig",
+      "definition": "export interface TypeScript58MigrationConfig {\n  version: {\n    from: string;\n    to: string;\n    releaseDate: string;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "Tailwind41MigrationConfig",
+      "definition": "export interface Tailwind41MigrationConfig {\n  version: {\n    from: string;\n    to: string;\n    releaseDate: string;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "ConsoleMigrationConfig",
+      "definition": "export interface ConsoleMigrationConfig {\n  complexPatterns: RegExp[];\n  logLevelMap: Record<string, string>;\n  structuredLogging: StructuredLoggingConfig;\n  rollbackPatterns: Record<string, string>;\n}",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "TypeScriptDebtConfig",
+      "definition": "export interface TypeScriptDebtConfig {\n  astPatterns: RegExp[];\n  stringReplacements: Record<string, string>;\n  severityMap: Record<string, 'high' | 'medium' | 'low'>;\n  complexityWeights: ComplexityWeights;\n  componentCriticality: ComponentCriticalityConfig;\n  typeAnalysis: TypeAnalysisConfig;\n}",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "ComplexityConfig",
+      "definition": "export interface ComplexityConfig {\n  thresholds: {\n    cyclomaticComplexity: number;\n    cognitiveComplexity: number;\n    linesOfCode: number;\n    maintainabilityIndex: number;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "PerformanceConfig",
+      "definition": "export interface PerformanceConfig {\n  bundleSize: {\n    total: number;\n    individual: number;\n    dynamicImport: number;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "SafetyConfig",
+      "definition": "export interface SafetyConfig {\n  migrationSafety: {\n    maxBatchSize: number;\n    requireTests: boolean;\n    autoRollback: boolean;\n    verificationSteps: string[];\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "RollbackConfig",
+      "definition": "export interface RollbackConfig {\n  enabled: boolean;\n  strategies: {\n    automatic: boolean;\n    manual: boolean;\n    conditional: boolean;\n  }",
+      "sourceFile": "core/patterns.ts",
+      "category": "core"
+    },
+    {
+      "name": "MigrationResult",
+      "definition": "export interface MigrationResult {\n  totalFiles: number;\n  modifiedFiles: string[];\n  skippedFiles: string[];\n  errors: string[];\n  summary: {\n    stringTransformations: number;\n    astTransformations: number;\n    consoleUpdates: number;\n    reactUpdates: number;\n    nextjsUpdates: number;\n    typescriptUpdates: number;\n    tailwindUpdates: number;\n    typescriptDebtFixes: number; // NEW: TypeScript debt fixes\n  }",
+      "sourceFile": "core/migrate.ts",
+      "category": "core"
+    }
+  ],
+  "fixedFiles": [
+    {
+      "path": "utils/general.ts",
+      "originalSize": 21387,
+      "newSize": 20718
+    },
+    {
+      "path": "utils/business-context.ts",
+      "originalSize": 13520,
+      "newSize": 12980
+    },
+    {
+      "path": "core/patterns.ts",
+      "originalSize": 40109,
+      "newSize": 38359
+    },
+    {
+      "path": "core/migrate.ts",
+      "originalSize": 46755,
+      "newSize": 46415
+    }
+  ],
+  "errors": []
+}

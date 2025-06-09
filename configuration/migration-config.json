@@ -1,0 +1,48 @@
+{
+  "typeAnalysisConfig": {
+    "includePatterns": [
+      "**/*.ts",
+      "**/*.tsx"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/*.d.ts"
+    ],
+    "similarityThreshold": 0.85,
+    "canonicalRoot": "src/types/canonical",
+    "canonicalStructure": {
+      "core": [
+        "primitives",
+        "enums",
+        "result",
+        "entity",
+        "factories",
+        "guards"
+      ],
+      "domain": [
+        "business",
+        "transformation",
+        "migration",
+        "patterns",
+        "risk"
+      ]
+    }
+  },
+  "importRewriteConfig": {
+    "targetRoot": "src/types/canonical",
+    "preferUmbrella": true,
+    "useNamedImports": true
+  },
+  "cleanupConfig": {
+    "removeEmptyDirs": true,
+    "backupBeforeDelete": true,
+    "backupDir": ".type-backup"
+  },
+  "ciConfig": {
+    "failOnDuplicates": true,
+    "checkThreshold": 0,
+    "includeInPreBuild": true
+  }
+}

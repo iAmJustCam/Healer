@@ -1,0 +1,165 @@
+{
+  "name": "@migration-engine/core",
+  "version": "2.0.0",
+  "description": "Production-ready TypeScript migration engine with SOLID architecture",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf dist",
+    "dev": "ts-node --transpile-only src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "typecheck": "tsc --noEmit",
+    "migrate": "ts-node --transpile-only execute.ts",
+    "migrate:prod": "npm run migrate -- --prod",
+    "migrate:consolidation": "npm run migrate -- --consolidation-only",
+    "migrate:reorganization": "npm run migrate -- --reorganization-only",
+    "migrate:help": "npm run migrate -- --help",
+    "validate:system": "npm run migrate -- --skip-validation --consolidation-only",
+    "backup:create": "node scripts/create-backup.js",
+    "backup:restore": "node scripts/restore-backup.js"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "typescript",
+    "migration",
+    "refactoring",
+    "ast",
+    "code-transformation",
+    "solid-principles"
+  ],
+  "author": "Migration Engine Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/company/migration-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/company/migration-engine/issues"
+  },
+  "homepage": "https://github.com/company/migration-engine#readme",
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.ts",
+      "**/?(*.)+(spec|test).ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.test.ts",
+      "!src/**/*.spec.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "@typescript-eslint/recommended",
+      "@typescript-eslint/recommended-requiring-type-checking"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module",
+      "project": "./tsconfig.json"
+    },
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/prefer-readonly": "error",
+      "@typescript-eslint/explicit-function-return-type": "error"
+    }
+  },
+  "tsconfig": {
+    "compilerOptions": {
+      "target": "ES2022",
+      "module": "CommonJS",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "strictFunctionTypes": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "declaration": true,
+      "declarationMap": true,
+      "sourceMap": true,
+      "outDir": "dist",
+      "rootDir": "src",
+      "baseUrl": ".",
+      "paths": {
+        "@/*": [
+          "src/*"
+        ],
+        "@/types/*": [
+          "../../../types/*"
+        ],
+        "@/utilities/*": [
+          "../../../shared-REFACTORED/*"
+        ]
+      }
+    },
+    "include": [
+      "src/**/*"
+    ],
+    "exclude": [
+      "node_modules",
+      "dist",
+      "**/*.test.ts",
+      "**/*.spec.ts"
+    ]
+  }
+}

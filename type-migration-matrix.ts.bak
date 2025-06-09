@@ -1,0 +1,442 @@
+/**
+ * TYPE MIGRATION MATRIX
+ *
+ * Comprehensive mapping from old fragmented types to new canonical SSOT types.
+ * Use this matrix to systematically update your codebase.
+ *
+ * Format: OLD_TYPE → NEW_TYPE (with notes where applicable)
+ */
+
+/// ============================================================================
+// ENUM VALUE MIGRATIONS - CASE STANDARDIZATION
+/// ============================================================================
+
+// RiskLevel enum standardization (UPPERCASE → lowercase)
+const RISK_LEVEL_MIGRATION = {
+  'RiskLevel.CRITICAL': 'RiskLevel.CRITICAL', // ✓ Already correct
+  'RiskLevel.HIGH': 'RiskLevel.HIGH', // ✓ Already correct
+  'RiskLevel.MEDIUM': 'RiskLevel.MEDIUM', // ✓ Already correct
+  'RiskLevel.LOW': 'RiskLevel.LOW', // ✓ Already correct
+  'RiskLevel.NONE': 'RiskLevel.NONE', // ✓ Already correct
+
+  // String literal migrations
+  "RiskLevel.CRITICAL": "'critical'",
+  "RiskLevel.HIGH": "'high'",
+  "RiskLevel.MEDIUM": "'medium'",
+  "RiskLevel.LOW": "'low'",
+  "RiskLevel.NONE": "'none'",
+} as const;
+
+// Severity enum standardization (UPPERCASE → lowercase)
+const SEVERITY_MIGRATION = {
+  'Severity.CRITICAL': 'Severity.CRITICAL', // ✓ Already correct
+  'Severity.ERROR': 'Severity.ERROR', // ✓ Already correct
+  'Severity.WARNING': 'Severity.WARNING', // ✓ Already correct
+  'Severity.INFO': 'Severity.INFO', // ✓ Already correct
+
+  // Remove duplicate HIGH/MEDIUM/LOW from Severity (use RiskLevel instead)
+  'Severity.HIGH': 'RiskLevel.HIGH', // ⚠️ DOMAIN CHANGE
+  'Severity.MEDIUM': 'RiskLevel.MEDIUM', // ⚠️ DOMAIN CHANGE
+  'Severity.LOW': 'RiskLevel.LOW', // ⚠️ DOMAIN CHANGE
+
+  // String literals
+  "RiskLevel.CRITICAL": "'critical'",
+  "'ERROR'": "'error'",
+  "'WARNING'": "'warning'",
+  "'INFO'": "'info'",
+} as const;
+
+// Framework enum standardization (mixed → lowercase_numbers)
+const FRAMEWORK_MIGRATION = {
+  'Framework.REACT19': 'Framework.REACT1919', // ⚠️ UPDATED TO VERSION
+  'Framework.NEXTJS15': 'Framework.NEXTJS15JS15', // ⚠️ UPDATED TO VERSION
+  'Framework.TYPESCRIPT5': 'Framework.TYPESCRIPT55', // ⚠️ UPDATED TO VERSION
+  'Framework.TAILWIND4': 'Framework.TAILWIND44', // ⚠️ UPDATED TO VERSION
+
+  // Remove frameworks not in new canonical set
+  'Framework.ANGULAR': '// REMOVED - Not in canonical set',
+  'Framework.VUE': '// REMOVED - Not in canonical set',
+  'Framework.SVELTE': '// REMOVED - Not in canonical set',
+  'Framework.EXPRESS': '// REMOVED - Not in canonical set',
+  'Framework.NEST': '// REMOVED - Not in canonical set',
+  'Framework.NUXT': '// REMOVED - Not in canonical set',
+
+  // String literals
+  "'REACT'": "'react19'",
+  "'NEXT'": "'nextjs15'",
+  "'TYPESCRIPT'": "'typescript5'",
+  "'TAILWIND'": "'tailwind4'",
+} as const;
+
+// TransformationStrategy enum standardization
+const TRANSFORMATION_STRATEGY_MIGRATION = {
+  'TransformationStrategy.IN_PLACE': 'TransformationStrategy.IN_PLACE', // ✓ Already correct
+  'TransformationStrategy.COPY_MODIFY': 'TransformationStrategy.COPY_MODIFY', // ✓ Already correct
+  'TransformationStrategy.CREATE_NEW': 'TransformationStrategy.CREATE_NEW', // ✓ Already correct
+  'TransformationStrategy.HYBRID': 'TransformationStrategy.HYBRID', // ✓ Already correct
+  'TransformationStrategy.INCREMENTAL': 'TransformationStrategy.INCREMENTAL', // ✓ Already correct
+
+  // String literals (UPPERCASE → lowercase)
+  "TransformationStrategy.IN_PLACE": "'in_place'",
+  "TransformationStrategy.COPY_MODIFY": "'copy_modify'",
+  "TransformationStrategy.CREATE_NEW": "'create_new'",
+  "TransformationStrategy.HYBRID": "'hybrid'",
+  "TransformationStrategy.INCREMENTAL": "'incremental'",
+} as const;
+
+// TransformationStatus enum standardization
+const TRANSFORMATION_STATUS_MIGRATION = {
+  'TransformationStatus.PENDING': 'TransformationStatus.PENDING', // ✓ Already correct
+  'TransformationStatus.IN_PROGRESS': 'TransformationStatus.RUNNING', // ⚠️ RENAMED
+  'TransformationStatus.COMPLETED': 'TransformationStatus.COMPLETED', // ✓ Already correct
+  'TransformationStatus.FAILED': 'TransformationStatus.FAILED', // ✓ Already correct
+  'TransformationStatus.SKIPPED': 'TransformationStatus.SKIPPED', // ✓ Already correct
+  'TransformationStatus.CANCELLED': 'TransformationStatus.CANCELLED', // ✓ Already correct
+
+  // String literals
+  "TransformationStatus.PENDING": "'pending'",
+  "TransformationStatus.RUNNING": "'running'", // ⚠️ RENAMED
+  "TransformationStatus.COMPLETED": "'completed'",
+  "TransformationStatus.FAILED": "'failed'",
+  "TransformationStatus.SKIPPED": "'skipped'",
+  "TransformationStatus.CANCELLED": "'cancelled'",
+} as const;
+
+// ErrorCategory enum standardization
+const ERROR_CATEGORY_MIGRATION = {
+  'ErrorCategory.VALIDATION': 'ErrorCategory.TYPE_DEFINITION', // ⚠️ CONSOLIDATED
+  'ErrorCategory.TRANSFORMATION': 'ErrorCategory.TYPE_DEFINITION', // ⚠️ CONSOLIDATED
+  'ErrorCategory.COMPILATION': 'ErrorCategory.SYNTAX_ERROR', // ⚠️ CONSOLIDATED
+  'ErrorCategory.RUNTIME': 'ErrorCategory.SYNTAX_ERROR', // ⚠️ CONSOLIDATED
+  'ErrorCategory.CONFIGURATION': 'ErrorCategory.TYPE_DEFINITION', // ⚠️ CONSOLIDATED
+
+  // Keep existing categories
+  'ErrorCategory.MODULE_RESOLUTION': 'ErrorCategory.MODULE_RESOLUTION', // ✓ Already correct
+  'ErrorCategory.IMPORT_PATH': 'ErrorCategory.IMPORT_PATH', // ✓ Already correct
+  'ErrorCategory.MISSING_EXPORT': 'ErrorCategory.MISSING_EXPORT', // ✓ Already correct
+  'ErrorCategory.TYPE_DEFINITION': 'ErrorCategory.TYPE_DEFINITION', // ✓ Already correct
+  'ErrorCategory.DUPLICATE_IDENTIFIER': 'ErrorCategory.DUPLICATE_IDENTIFIER', // ✓ Already correct
+} as const;
+
+// BusinessDomain enum standardization
+const BUSINESS_DOMAIN_MIGRATION = {
+  'BusinessDomain.AUTHENTICATION': 'BusinessDomain.USER_AUTHENTICATION', // ⚠️ RENAMED
+  'BusinessDomain.AUTHORIZATION': 'BusinessDomain.USER_AUTHENTICATION', // ⚠️ CONSOLIDATED
+  'BusinessDomain.USER_MANAGEMENT': 'BusinessDomain.USER_AUTHENTICATION', // ⚠️ CONSOLIDATED
+  'BusinessDomain.DATA_PROCESSING': 'BusinessDomain.DATA_PROCESSING', // ✓ Already correct
+  'BusinessDomain.REPORTING': 'BusinessDomain.SYSTEM_HEALTH', // ⚠️ CONSOLIDATED
+  'BusinessDomain.INTEGRATION': 'BusinessDomain.API_INTEGRATION', // ⚠️ RENAMED
+  'BusinessDomain.CORE_BUSINESS': 'BusinessDomain.DATA_PROCESSING', // ⚠️ CONSOLIDATED
+  'BusinessDomain.INFRASTRUCTURE': 'BusinessDomain.SYSTEM_HEALTH', // ⚠️ CONSOLIDATED
+
+  // String literals
+  "'AUTHENTICATION'": "'user_authentication'",
+  "'DATA_PROCESSING'": "'data_processing'",
+  "'INTEGRATION'": "'api_integration'",
+  "'USER_INTERFACE'": "'user_interface'",
+  "'SYSTEM_HEALTH'": "'system_health'",
+} as const;
+
+/// ============================================================================
+// INTERFACE CONSOLIDATION MIGRATIONS
+/// ============================================================================
+
+// WebSocket Types (consolidated from multiple definitions)
+const WEBSOCKET_TYPE_MIGRATION = {
+  // All WebSocket types are kept but moved to specialized domain
+  WebSocketConnectionId: 'WebSocketConnectionId', // ✓ Kept
+  WebSocketMessageId: 'WebSocketMessageId', // ✓ Kept
+  WebSocketChannelName: 'WebSocketChannelName', // ✓ Kept
+  WebSocketStatus: '// REMOVED - Use string literals instead',
+  WebSocketMessageType: '// REMOVED - Use string literals instead',
+  MessageDirection: '// REMOVED - Use string literals instead',
+
+  // WebSocket interfaces simplified
+  WebSocketConnection: '// SIMPLIFIED - Use basic object types',
+  WebSocketOperations: '// SIMPLIFIED - Use basic object types',
+  WebSocketRegistry: '// SIMPLIFIED - Use basic object types',
+} as const;
+
+// Chart Types (consolidated)
+const CHART_TYPE_MIGRATION = {
+  ChartId: 'ChartId', // ✓ Kept
+  ChartType: '// REMOVED - Use string literals instead',
+  ChartConfig: '// SIMPLIFIED - Use basic object types',
+  ChartInstance: '// SIMPLIFIED - Use basic object types',
+  NetworkNode: '// SIMPLIFIED - Use basic object types',
+  NetworkEdge: '// SIMPLIFIED - Use basic object types',
+} as const;
+
+// AI Verification Types (major consolidation)
+const AI_VERIFICATION_MIGRATION = {
+  VerificationStepCategory: '// REMOVED - Use string literals',
+  AIErrorCategory: '// REMOVED - Use ErrorCategory instead',
+  AIRecoveryType: '// REMOVED - Use string literals',
+  CascadeType: '// REMOVED - Use string literals',
+  DeploymentEnvironment: '// REMOVED - Use string literals',
+  DeploymentStrategy: '// REMOVED - Use string literals',
+  SeniorityLevel: '// REMOVED - Use string literals',
+  ReviewerType: '// REMOVED - Use string literals',
+  VerificationCategory: '// REMOVED - Use string literals',
+  Priority: '// REMOVED - Use Severity instead',
+  MitigationStrategyType: '// REMOVED - Use string literals',
+
+  // Keep core interfaces but simplify
+  VerificationInput: '// SIMPLIFIED - Use basic object types',
+  VerificationPlan: '// SIMPLIFIED - Use basic object types',
+  RiskAssessmentResult: 'RiskAssessment', // ⚠️ RENAMED
+  AIAnalysisResult: '// SIMPLIFIED - Use basic object types',
+} as const;
+
+// Configuration Types (consolidated)
+const CONFIGURATION_TYPE_MIGRATION = {
+  AutoFixResult: '// SIMPLIFIED - Use basic object types',
+  MergeOptions: '// SIMPLIFIED - Use basic object types',
+  ConfigurationComparison: '// SIMPLIFIED - Use basic object types',
+  ConfigurationDifference: '// SIMPLIFIED - Use basic object types',
+  ComparisonSummary: '// SIMPLIFIED - Use basic object types',
+  ConfigurationHealth: '// SIMPLIFIED - Use basic object types',
+  SafetyAssessment: '// SIMPLIFIED - Use basic object types',
+} as const;
+
+// Project Reorganization Types (consolidated)
+const REORGANIZATION_TYPE_MIGRATION = {
+  DomainMapping: '// SIMPLIFIED - Use basic object types',
+  FileMovement: '// SIMPLIFIED - Use basic object types',
+  BusinessImpactAssessment: 'RiskAssessment', // ⚠️ RENAMED
+  ReorganizationOptions: '// SIMPLIFIED - Use basic object types',
+  ReorganizationResult: '// SIMPLIFIED - Use basic object types',
+  ReorganizationMetrics: '// SIMPLIFIED - Use basic object types',
+} as const;
+
+/// ============================================================================
+// TYPE ALIAS CONSOLIDATIONS
+/// ============================================================================
+
+const TYPE_ALIAS_MIGRATION = {
+  // Complexity scoring standardization
+  ComplexityScore: 'ComplexityScore', // ✓ Now branded type (0-1)
+
+  // Remove redundant business impact levels
+  BusinessImpactLevel: '// REMOVED - Use RiskLevel instead',
+
+  // Standardize migration strategy naming
+  MigrationStrategy: '// REMOVED - Use TransformationStrategy instead',
+
+  // Remove redundant risk factor types
+  RiskFactorType: '// REMOVED - Use string literals instead',
+
+  // Cascade type simplification
+  CascadeType: '// REMOVED - Use string literals instead',
+} as const;
+
+/// ============================================================================
+// UTILITY FUNCTION MIGRATIONS
+/// ============================================================================
+
+const UTILITY_FUNCTION_MIGRATION = {
+  // Factory functions (standardized names)
+  createApiSuccess: 'createApiSuccess', // ✓ Already correct
+  createApiError: 'createApiError', // ✓ Already correct
+  createApiResponse: 'createApiResponse', // ✓ Already correct
+  createSystemError: '// REMOVED - Use createApiError instead',
+  createEntityId: 'createEntityId', // ✓ Already correct
+  createOperationId: 'createOperationId', // ✓ Already correct
+  createTimestamp: 'createTimestamp', // ✓ Already correct
+  createFilePath: 'createFilePath', // ✓ Already correct
+  createDirectoryPath: 'createDirectoryPath', // ✓ Already correct
+  createPatternId: 'createPatternId', // ✓ Already correct
+  createTransformationId: 'createTransformationId', // ✓ Already correct
+
+  // New utility functions
+  createComplexityScore: 'createComplexityScore', // ✅ NEW
+
+  // Type guards (standardized)
+  isRiskLevel: 'isRiskLevel', // ✓ Already correct
+  isFramework: 'isFramework', // ✓ Already correct
+  isSeverity: 'isSeverity', // ✓ Already correct
+  isTransformationStrategy: 'isTransformationStrategy', // ✅ NEW
+
+  // Removed utility functions
+  createWebSocketConnectionId: '// REMOVED - Use createEntityId instead',
+  createWebSocketMessageId: '// REMOVED - Use createEntityId instead',
+  createChartId: '// REMOVED - Use createEntityId instead',
+  createSessionContext: '// REMOVED - Create manually instead',
+  parseArguments: '// REMOVED - Use standard arg parsing libraries',
+} as const;
+
+/// ============================================================================
+// IMPORT PATH MIGRATIONS
+/// ============================================================================
+
+const IMPORT_MIGRATION = {
+  // Old fragmented imports → New canonical imports
+  "import { RiskLevel } from '../types/canonical-types'":
+    "import { RiskLevel } from '@types/canonical-types'",
+  "import { ApiResponse } from '../types/api.types'":
+    "import { ApiResponse } from '@types/canonical-types'",
+  "import { MigrationError } from '../types/error.types'":
+    "import { MigrationError } from '@types/canonical-types'",
+  "import { Framework } from '../types/framework.types'":
+    "import { Framework } from '@types/canonical-types'",
+
+  // Consolidate multiple imports
+  "import { RiskLevel, Severity, Framework } from '../types/canonical-types'":
+    "import { RiskLevel, Severity, Framework } from '@types/canonical-types'",
+
+  // Remove type-only imports that became values (for enums)
+  'import { Framework }': 'import { Framework }',
+  'import { RiskLevel }': 'import { RiskLevel }',
+  'import { Severity }': 'import { Severity }',
+  'import { TransformationStrategy }': 'import { TransformationStrategy }',
+} as const;
+
+/// ============================================================================
+// AUTOMATED MIGRATION SCRIPT PATTERNS
+/// ============================================================================
+
+const REGEX_PATTERNS = {
+  // Find old enum string values
+  riskLevelValues: /'(CRITICAL|HIGH|MEDIUM|LOW|NONE)'/g,
+  severityValues: /'(CRITICAL|ERROR|WARNING|INFO)'/g,
+  frameworkValues: /'(REACT|NEXT|TYPESCRIPT|TAILWIND)'/g,
+  transformationStrategyValues: /'(IN_PLACE|COPY_MODIFY|CREATE_NEW|HYBRID|INCREMENTAL)'/g,
+  transformationStatusValues: /'(PENDING|IN_PROGRESS|COMPLETED|FAILED|SKIPPED|CANCELLED)'/g,
+
+  // Find old import patterns
+  fragmentedImports: /import\s+(?:type\s+)?{([^}]+)}\s+from\s+['"](\.\.\/types\/[^'"]+)['"]/g,
+  typeOnlyImports:
+    /import\s+type\s+{\s*([^}]*(?:Framework|RiskLevel|Severity|TransformationStrategy)[^}]*)\s*}/g,
+
+  // Find old interface usage
+  removedInterfaces:
+    /(WebSocketStatus|ChartType|VerificationStepCategory|AIErrorCategory|BusinessImpactLevel)/g,
+} as const;
+
+/// ============================================================================
+// MIGRATION SCRIPT REPLACEMENTS
+/// ============================================================================
+
+const REPLACEMENTS = {
+  // Enum value replacements
+  "RiskLevel.CRITICAL": "'critical'",
+  "RiskLevel.HIGH": "'high'",
+  "RiskLevel.MEDIUM": "'medium'",
+  "RiskLevel.LOW": "'low'",
+  "RiskLevel.NONE": "'none'",
+  "'ERROR'": "'error'",
+  "'WARNING'": "'warning'",
+  "'INFO'": "'info'",
+  "'REACT'": "'react19'",
+  "'NEXT'": "'nextjs15'",
+  "'TYPESCRIPT'": "'typescript5'",
+  "'TAILWIND'": "'tailwind4'",
+  "TransformationStrategy.IN_PLACE": "'in_place'",
+  "TransformationStrategy.COPY_MODIFY": "'copy_modify'",
+  "TransformationStrategy.CREATE_NEW": "'create_new'",
+  "TransformationStrategy.HYBRID": "'hybrid'",
+  "TransformationStrategy.INCREMENTAL": "'incremental'",
+  "TransformationStatus.PENDING": "'pending'",
+  "TransformationStatus.RUNNING": "'running'",
+  "TransformationStatus.COMPLETED": "'completed'",
+  "TransformationStatus.FAILED": "'failed'",
+  "TransformationStatus.SKIPPED": "'skipped'",
+  "TransformationStatus.CANCELLED": "'cancelled'",
+
+  // Type-only import fixes
+  'import { Framework': 'import { Framework',
+  'import { RiskLevel': 'import { RiskLevel',
+  'import { Severity': 'import { Severity',
+  'import { TransformationStrategy': 'import { TransformationStrategy',
+
+  // Import path consolidation
+  "from '../types/": "from '@types/canonical-types'",
+  "from './types/": "from '@types/canonical-types'",
+  "from '../../types/": "from '@types/canonical-types'",
+} as const;
+
+/// ============================================================================
+// MANUAL REVIEW REQUIRED
+/// ============================================================================
+
+const MANUAL_REVIEW_ITEMS = [
+  {
+    pattern: 'BusinessDomain usage',
+    action: 'Review all BusinessDomain enum usage and map to new 5-domain structure',
+    files: ['**/*domain*.ts', '**/*business*.ts'],
+  },
+  {
+    pattern: 'Framework version assumptions',
+    action: 'Verify all Framework.REACT19 → Framework.REACT1919 changes are appropriate',
+    files: ['**/*framework*.ts', '**/*react*.ts', '**/*next*.ts'],
+  },
+  {
+    pattern: 'AI Verification interfaces',
+    action: 'Replace complex AI interfaces with basic object types or remove entirely',
+    files: ['**/ai-verification/**/*.ts', '**/*verification*.ts'],
+  },
+  {
+    pattern: 'WebSocket enum usage',
+    action: 'Replace WebSocket enums with string literals',
+    files: ['**/*websocket*.ts', '**/*socket*.ts'],
+  },
+  {
+    pattern: 'Chart type usage',
+    action: 'Replace Chart enums with string literals',
+    files: ['**/*chart*.ts', '**/*graph*.ts'],
+  },
+  {
+    pattern: 'TransformationStatus.IN_PROGRESS',
+    action: 'Replace all IN_PROGRESS with RUNNING',
+    files: ['**/*transformation*.ts', '**/*migration*.ts'],
+  },
+  {
+    pattern: 'Error category consolidation',
+    action: 'Review error categorization - many categories consolidated to TYPE_DEFINITION',
+    files: ['**/*error*.ts', '**/*validation*.ts'],
+  },
+] as const;
+
+/// ============================================================================
+// MIGRATION CHECKLIST
+/// ============================================================================
+
+const MIGRATION_CHECKLIST = [
+  '□ 1. Backup existing codebase',
+  '□ 2. Replace canonical-types.ts with new clean version',
+  '□ 3. Run find/replace for enum string values (see REPLACEMENTS above)',
+  '□ 4. Update all imports to use @types/canonical-types path',
+  '□ 5. Fix type-only imports for enums (remove "type" keyword)',
+  '□ 6. Remove references to deleted interfaces/enums',
+  '□ 7. Update TransformationStatus.IN_PROGRESS → RUNNING',
+  '□ 8. Consolidate BusinessDomain usage to 5 domains',
+  '□ 9. Update Framework references to versioned names',
+  '□ 10. Run TypeScript compilation and fix remaining errors',
+  '□ 11. Update tests to use new enum values',
+  '□ 12. Review and simplify AI Verification code',
+  '□ 13. Review and simplify WebSocket/Chart code',
+  '□ 14. Run full test suite',
+  '□ 15. Update documentation with new type structure',
+] as const;
+
+export {
+  AI_VERIFICATION_MIGRATION,
+  BUSINESS_DOMAIN_MIGRATION,
+  CHART_TYPE_MIGRATION,
+  CONFIGURATION_TYPE_MIGRATION,
+  ERROR_CATEGORY_MIGRATION,
+  FRAMEWORK_MIGRATION,
+  IMPORT_MIGRATION,
+  MANUAL_REVIEW_ITEMS,
+  MIGRATION_CHECKLIST,
+  REGEX_PATTERNS,
+  REORGANIZATION_TYPE_MIGRATION,
+  REPLACEMENTS,
+  RISK_LEVEL_MIGRATION,
+  SEVERITY_MIGRATION,
+  TRANSFORMATION_STATUS_MIGRATION,
+  TRANSFORMATION_STRATEGY_MIGRATION,
+  TYPE_ALIAS_MIGRATION,
+  UTILITY_FUNCTION_MIGRATION,
+  WEBSOCKET_TYPE_MIGRATION,
+};

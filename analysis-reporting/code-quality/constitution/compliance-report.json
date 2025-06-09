@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-06-06T01:29:47.770Z",
+  "summary": {
+    "total": 4,
+    "errors": 0,
+    "warnings": 4,
+    "info": 0,
+    "filesChecked": 1
+  },
+  "violations": [
+    {
+      "id": "API-001",
+      "type": "prohibition",
+      "severity": "warning",
+      "file": "utils/business-context.ts",
+      "line": 216,
+      "message": "Consider using apiUtils.ok/err for consistent response format",
+      "code": "return dataRiskPatterns.some(pattern => contentResult"
+    },
+    {
+      "id": "API-001",
+      "type": "prohibition",
+      "severity": "warning",
+      "file": "utils/business-context.ts",
+      "line": 235,
+      "message": "Consider using apiUtils.ok/err for consistent response format",
+      "code": "return accessRiskPatterns.some(pattern => contentResult"
+    },
+    {
+      "id": "API-001",
+      "type": "prohibition",
+      "severity": "warning",
+      "file": "utils/business-context.ts",
+      "line": 269,
+      "message": "Consider using apiUtils.ok/err for consistent response format",
+      "code": "return validatedResult.success ? validatedResult"
+    },
+    {
+      "id": "API-001",
+      "type": "prohibition",
+      "severity": "warning",
+      "file": "utils/business-context.ts",
+      "line": 269,
+      "message": "Consider using apiUtils.ok/err for consistent response format",
+      "code": "return validatedResult"
+    }
+  ]
+}

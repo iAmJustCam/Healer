@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "outDir": "../dist",
+    "rootDir": "./",
+    "baseUrl": "./",
+    "paths": {
+      "@types": ["./types/canonical-types"],
+      "@types/*": ["./types/*"],
+      "@/types/*": ["./types/*"],
+      "@/types/foundation.types": ["./types/foundation.types"],
+      "@/types/transformation-engine.types": ["./types/transformation-engine.types"],
+      "@/types/pipelines/transformation.pipeline": ["./pipelines/transformation.pipeline.d.ts"],
+      "@/types/schemas/transformation.schemas": ["./shared-foundation/validation-schemas.ts"],
+      "@/utilities/*": ["./shared-foundation/*"],
+      "@shared/*": ["./shared-foundation/*"],
+      "@shared": ["./shared-foundation"],
+      "@cli": ["./cli-interface"],
+      "@ai": ["./ai-verification"],
+      "@analysis": ["./analysis-reporting"],
+      "@config": ["./configuration"],
+      "@migration": ["./migration-engine"],
+      "@patterns": ["./pattern-detection"],
+      "@transform": ["./transformation-engine"],
+      "@quality": ["./code-quality"],
+      "@testing": ["./testing"]
+    }
+  },
+  "include": ["./**/*", "./types/foundation.types.ts", "./types/transformation-engine.types.ts", "./types/canonical-types.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+}
