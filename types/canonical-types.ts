@@ -24,7 +24,7 @@ import type {
   TransformationId,
   TransformationResult,
   ValidationError,
-} from '@types/canonical-types';
+} from './canonical-types.js';
 import {
   createApiError,
   createApiSuccess,
@@ -34,7 +34,7 @@ import {
   RiskLevel,
   validateInput,
   ValidationSchema,
-} from '@types/canonical-types';
+} from './canonical-types.js';
 
 // Pure Node.js imports - constitutional environment detection applied
 import { EventEmitter } from 'events';
